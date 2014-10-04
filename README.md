@@ -15,9 +15,13 @@ This project was created for learning purposes.
 * Html Agility Pack
 * Json.NET
 * TagLib#
-* My branch of Soundcloud.NET
+* [My branch of Soundcloud.NET](https://github.com/Ghost93/SoundCloud.NET) (*waiting for PR to be added...*)
 
 #####And the following repositories helped me:
 
-* soundcloud-dl
-* bandcamp-dl
+* [soundcloud-dl](https://github.com/yasoob/soundcloud-dl)
+* [bandcamp-dl](https://github.com/iheanyi/bandcamp-dl)
+
+
+
+
