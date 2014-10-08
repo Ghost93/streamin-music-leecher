@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicServiceLeecher.Workspaces;
 
 namespace MusicServiceLeecher
 {
@@ -10,8 +11,8 @@ namespace MusicServiceLeecher
     {
         string Name { get; }
         Uri BaseUri { get; }
-        bool DownloadSong(Workspace workspace, Uri songUri);
-        bool DownloadAlbum(Workspace workspace, Uri albumUri);
+        bool DownloadSong(IWorkspace fileSystemWorkspace, Uri songUri);
+        bool DownloadAlbum(IWorkspace fileSystemWorkspace, Uri albumUri);
 
     }
 }

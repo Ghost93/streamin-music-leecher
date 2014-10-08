@@ -4,16 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
 using MusicServiceLeecher.Utilities;
 using TagLib;
 using TagLib.Id3v2;
 using File = TagLib.File;
 
-namespace MusicServiceLeecher
+namespace MusicServiceLeecher.Workspaces
 {
-    public class Workspace
+    public class FileSystemWorkspace : IWorkspace
     {
         #region Constants
 
@@ -32,22 +30,22 @@ namespace MusicServiceLeecher
 
         #region Constructors
 
-        public Workspace(string workingDirectory, bool createIfNotExists)
+        public FileSystemWorkspace(string workingDirectory, bool createIfNotExists)
             : this(workingDirectory, createIfNotExists, DEFAULT_PATTERN)
         {
         }
 
-        public Workspace(DirectoryInfo workingDirectory, bool createIfNotExists)
+        public FileSystemWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists)
             : this(workingDirectory, createIfNotExists, DEFAULT_PATTERN)
         {
         }
 
-        public Workspace(string workingDirectory, bool createIfNotExists, string pattern)
+        public FileSystemWorkspace(string workingDirectory, bool createIfNotExists, string pattern)
             : this(new DirectoryInfo(workingDirectory), createIfNotExists, pattern)
         {
         }
 
-        public Workspace(DirectoryInfo workingDirectory, bool createIfNotExists, string pattern)
+        public FileSystemWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists, string pattern)
         {
             if (workingDirectory == null)
             {
@@ -78,7 +76,10 @@ namespace MusicServiceLeecher
 
         public bool HandleTrack(Track track)
         {
-            if (track == null) throw new ArgumentNullException("track");
+            if (track == null)
+            {
+                throw new ArgumentNullException("track");
+            }
 
             if (track.DownloadUri == null)
             {
@@ -234,14 +235,7 @@ namespace MusicServiceLeecher
 
         private string CalculatePrefix(int numOfLeadingZeros)
         {
-            string prefix = string.Empty;
-
-            for (int i = 0; i < numOfLeadingZeros; i++)
-            {
-                prefix += "0";
-            }
-
-            return prefix;
+            return new string('0',numOfLeadingZeros);
         }
 
         #endregion

@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Text;
 using HtmlAgilityPack;
 using MusicServiceLeecher.Utilities;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoundCloud.NET;
 
@@ -17,17 +13,27 @@ namespace MusicServiceLeecher.MusicStreamingServices
 {
     public class SoundcloudService : IMusicStreamingService
     {
+        #region Private Members
+
+        private const string MP3_128_KBPS_URL = "http_mp3_128_url";
 
         //todo: get it out of here!
-        private string clientId = "143d391e891ba3f8853fe3ab63c68037";
-        private string clientSecret = "477d7ea6a65dcbe25aa6c4c60ccb9ef8";
-        private string username = "gh0st93";
-        private string password = "20245056";
+        private string m_ClintId = "143d391e891ba3f8853fe3ab63c68037";
+        private string m_ClientSecret = "477d7ea6a65dcbe25aa6c4c60ccb9ef8";
+        private string m_SoundCloudUsername = "gh0st93";
+        private string m_SoundCloudPassword = "20245056";
+
         private SoundCloudAccessToken m_AccessToken;
         private SoundCloudClient m_SoundCloudClient;
 
+        #endregion
+
+        #region Properties
+
         public string Name { get; private set; }
         public Uri BaseUri { get; private set; }
+
+        #endregion
 
         public SoundcloudService()
         {
@@ -39,29 +45,22 @@ namespace MusicServiceLeecher.MusicStreamingServices
             m_AccessToken = accessToken;
         }
 
+        #region Public Functions
 
-        public bool DownloadSong(Workspace workspace, Uri songUri)
+        public bool DownloadSong(IWorkspace workspace, Uri songUri)
         {
             throw new NotImplementedException();
         }
 
-        public bool DownloadAlbum(Workspace workspace, Uri albumUri)
+        public bool DownloadAlbum(IWorkspace workspace, Uri albumUri)
         {
             IEnumerable<Track> album;
 
             try
             {
                 album = GetAlbumTracksByUri(albumUri);
-            }
-            catch (Exception e)
-            {
-                //todo: log exception
-                return false;
-            }
-
-            try
-            {
                 return workspace.HandleAlbum(album);
+
             }
             catch (Exception e)
             {
@@ -69,6 +68,10 @@ namespace MusicServiceLeecher.MusicStreamingServices
                 return false;
             }
         }
+
+        #endregion
+
+        #region Private Functions
 
         private IEnumerable<Track> GetAlbumTracksByUri(Uri albumUri)
         {
@@ -80,7 +83,7 @@ namespace MusicServiceLeecher.MusicStreamingServices
             if (!string.IsNullOrEmpty(playlist.ArtworkUrl))
             {
                 Uri artworkUri = new Uri(playlist.ArtworkUrl);
-                res.ForEach(track=>track.AlbumArtUri = artworkUri);
+                res.ForEach(track => track.AlbumArtUri = artworkUri);
             }
 
             return res;
@@ -94,19 +97,8 @@ namespace MusicServiceLeecher.MusicStreamingServices
             {
                 SoundCloud.NET.Track trackToHandle = playlist.Tracks[i - 1];
 
-                string trackArtist = string.Empty, trackName = string.Empty;
-                string[] splittedTitle = trackToHandle.Title.Trim().Split(new[] {" - "}, StringSplitOptions.RemoveEmptyEntries);
-
-                if (splittedTitle.Length >= 2)
-                {
-                    trackArtist = splittedTitle[0];
-                    trackName = splittedTitle[1];
-                }
-                else if (splittedTitle.Length <= 1)
-                {
-                    trackName = trackToHandle.Title;
-                }
-
+                string trackName;
+                string trackArtist = GetTrackArtist(trackToHandle, out trackName);
 
                 Uri downloadUri = null;
                 if (trackToHandle.Downloadable || trackToHandle.Streamable)
@@ -114,18 +106,15 @@ namespace MusicServiceLeecher.MusicStreamingServices
                     downloadUri = CreateDownloadUriByTrackId(trackToHandle.Id);
                 }
 
-                if(downloadUri==null)
+                if (downloadUri == null)
                 {
-                    Console.WriteLine("Track " + trackToHandle.Title + " is skipped. No download/stream uri at all...");
+                    Console.WriteLine("Track {0} is skipped. No download/stream uri at all...", trackToHandle.Title);
                 }
 
-                uint trackReleaseYear;
-                if (!uint.TryParse(trackToHandle.ReleaseYear, out trackReleaseYear))
-                {
-                    trackReleaseYear = playlist.ReleaseYear != null ? (uint) playlist.ReleaseYear : 0;
-                }
+                uint trackReleaseYear = GetTrackReleaseYear(playlist, trackToHandle);
 
-                Track trackToAdd = new Track(trackArtist, trackName, trackReleaseYear, playlist.Title, (uint) (i), downloadUri);
+                Track trackToAdd = new Track(trackArtist, trackName, trackReleaseYear, playlist.Title, (uint)(i),
+                    downloadUri);
                 if (trackToHandle.Artwork != null)
                 {
                     trackToAdd.AlbumArtUri = new Uri(trackToHandle.Artwork);
@@ -136,17 +125,49 @@ namespace MusicServiceLeecher.MusicStreamingServices
             return res;
         }
 
+        private static uint GetTrackReleaseYear(Playlist playlist, SoundCloud.NET.Track trackToHandle)
+        {
+            uint trackReleaseYear;
+            if (!uint.TryParse(trackToHandle.ReleaseYear, out trackReleaseYear))
+            {
+                trackReleaseYear = playlist.ReleaseYear != null ? (uint)playlist.ReleaseYear : 0;
+            }
+            return trackReleaseYear;
+        }
+
+        private string GetTrackArtist(SoundCloud.NET.Track trackToHandle, out string trackName)
+        {
+            trackName = string.Empty;
+            string trackArtist = string.Empty;
+            string[] splittedTitle = trackToHandle.Title.Trim()
+                .Split(new[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splittedTitle.Length >= 2)
+            {
+                trackArtist = splittedTitle[0];
+                trackName = splittedTitle[1];
+            }
+            else if (splittedTitle.Length <= 1)
+            {
+                trackName = trackToHandle.Title;
+            }
+            return trackArtist;
+        }
+
         private Uri CreateDownloadUriByTrackId(int trackId)
         {
-            string streamUriString = string.Format("http://api.sndcdn.com/i1/tracks/{0}/streams?client_id={1}", trackId, clientId);
+            string streamUriString =
+                string.Format("http://api.sndcdn.com/i1/tracks/{0}/streams?client_id={1}",
+                    trackId, m_ClintId);
+
             HttpWebResponse response = MakeModifiedUserAgentRequest(new Uri(streamUriString), true);
             string jsonResponse = WebUtils.GetResponseText(response, Encoding.UTF8);
-            JObject metadata = JObject.Parse(jsonResponse);
-            if (metadata["http_mp3_128_url"] == null)
+            JObject trackMetadata = JObject.Parse(jsonResponse);
+            if (trackMetadata[MP3_128_KBPS_URL] == null)
             {
                 return null;
             }
-            return new Uri(metadata["http_mp3_128_url"].ToString());
+            return new Uri(trackMetadata[MP3_128_KBPS_URL].ToString());
         }
 
         private int ExtractIdFromUri(Uri uri)
@@ -163,11 +184,14 @@ namespace MusicServiceLeecher.MusicStreamingServices
                         node =>
                             node.Name == "meta" && node.HasAttributes &&
                             node.Attributes.Any(
-                                attribute => attribute.Name == "property" && attribute.Value == "al:android:url"))
+                                att => att.Name == "property" && att.Value == "al:android:url"))
                     .Select(node => node.Attributes["content"].Value)
                     .FirstOrDefault();
 
-            if (androidUrl == null) throw new ArgumentNullException("androidUrl", "Could not get androidUrl");
+            if (androidUrl == null)
+            {
+                throw new ArgumentNullException("androidUrl", "Could not get androidUrl");
+            }
 
             int res = int.Parse(androidUrl.Split(':').Last());
             return res;
@@ -194,7 +218,9 @@ namespace MusicServiceLeecher.MusicStreamingServices
 
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64)";
             if (json)
+            {
                 request.ContentType = "application/json";
+            }
             return WebUtils.GetResponse(request);
         }
 
@@ -208,7 +234,12 @@ namespace MusicServiceLeecher.MusicStreamingServices
             SoundCloudClient client;
             try
             {
-                client = new SoundCloudClient(new SoundCloudCredentials(clientId, clientSecret, username, password));
+                client = new SoundCloudClient(
+                             new SoundCloudCredentials(m_ClintId, 
+                                                       m_ClientSecret, 
+                                                       m_SoundCloudUsername,
+                                                       m_SoundCloudPassword)
+                                             );
 
                 accessToken = client.Authenticate();
                 if (!client.IsAuthenticated || accessToken == null)
@@ -222,5 +253,8 @@ namespace MusicServiceLeecher.MusicStreamingServices
             }
             return client;
         }
+
+        #endregion
+
     }
 }

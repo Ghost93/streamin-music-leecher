@@ -7,6 +7,7 @@ using System.Text;
 using HtmlAgilityPack;
 using Microsoft.Ajax.Utilities;
 using MusicServiceLeecher.Utilities;
+using MusicServiceLeecher.Workspaces;
 using Newtonsoft.Json.Linq;
 
 namespace MusicServiceLeecher.MusicStreamingServices
@@ -24,22 +25,14 @@ namespace MusicServiceLeecher.MusicStreamingServices
             m_minifier = new Minifier();
         }
 
-        public bool DownloadSong(Workspace workspace, Uri songUri)
+        public bool DownloadSong(IWorkspace workspace, Uri songUri)
         {
             Track track;
             try
             {
                 track = GetTrackByUri(songUri);
-            }
-            catch (Exception e)
-            {
-                //todo: log exception
-                return false;
-            }
-
-            try
-            {
                 return workspace.HandleTrack(track);
+
             }
             catch (Exception e)
             {
@@ -48,23 +41,15 @@ namespace MusicServiceLeecher.MusicStreamingServices
             }
         }
 
-        public bool DownloadAlbum(Workspace workspace, Uri albumUri)
+        public bool DownloadAlbum(IWorkspace workspace, Uri albumUri)
         {
             IEnumerable<Track> album;
 
             try
             {
                 album = GetAlbumTracksByUri(albumUri);
-            }
-            catch (Exception e)
-            {
-                //todo: log exception
-                return false;
-            }
-
-            try
-            {
                 return workspace.HandleAlbum(album);
+
             }
             catch (Exception e)
             {

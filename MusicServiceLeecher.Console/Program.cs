@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusicServiceLeecher.MusicStreamingServices;
+using MusicServiceLeecher.Workspaces;
 
 namespace MusicServiceLeecher.Console
 {
@@ -11,7 +12,7 @@ namespace MusicServiceLeecher.Console
     {
         static void Main(string[] args)
         {
-            Workspace ws = new Workspace(string.Format("{0}\\Test\\", Environment.CurrentDirectory), true);
+            IWorkspace ws = new FileSystemWorkspace(string.Format("{0}\\Test\\", Environment.CurrentDirectory), true);
             //BandcampService bandcampService = new BandcampService();
             //bandcampService.DownloadAlbum(ws,
               //  new Uri("http://asafavidanmusic.bandcamp.com/album/avidan-in-a-box-live-acoustic-recordings"));
