@@ -49,7 +49,17 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
 
         public bool DownloadSong(IWorkspace workspace, Uri songUri)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Track track = GetSongByUri(songUri);
+                return workspace.HandleTrack(track);
+            }
+            catch (Exception e)
+            {
+                //todo: log exception
+                return false;
+            }
+
         }
 
         public bool DownloadAlbum(IWorkspace workspace, Uri albumUri)
@@ -70,20 +80,22 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
 
         #region Private Functions
 
+        private Track GetSongByUri(Uri songUri)
+        {
+            int songId = ExtractIdFromUri(songUri);
+
+            SoundCloud.NET.Track soundcloudTrack = SoundCloud.NET.Track.GetTrack(songId);
+
+            return GetTrackBySoundcloudTrack(soundcloudTrack);
+        }
+
         private IEnumerable<Track> GetAlbumTracksByUri(Uri albumUri)
         {
             int playlistId = ExtractIdFromUri(albumUri);
+
             Playlist playlist = Playlist.GetPlaylist(playlistId);
 
-            List<Track> res = GetPlaylist(playlist);
-
-            if (!string.IsNullOrEmpty(playlist.ArtworkUrl))
-            {
-                Uri artworkUri = new Uri(playlist.ArtworkUrl);
-                res.ForEach(track => track.AlbumArtUri = artworkUri);
-            }
-
-            return res;
+            return GetPlaylist(playlist);
         }
 
         private List<Track> GetPlaylist(Playlist playlist)
@@ -94,42 +106,51 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
             {
                 SoundCloud.NET.Track trackToHandle = playlist.Tracks[i - 1];
 
-                string trackName;
-                string trackArtist = GetTrackArtist(trackToHandle, out trackName);
-
-                Uri downloadUri = null;
-                if (trackToHandle.Downloadable || trackToHandle.Streamable)
+                Track trackToAdd = GetTrackBySoundcloudTrack(trackToHandle);
+                trackToAdd.TrackNumber = (uint)i;
+                if (playlist.ReleaseYear != null)
                 {
-                    downloadUri = CreateDownloadUriByTrackId(trackToHandle.Id);
+                    trackToAdd.Year = (uint)playlist.ReleaseYear;
                 }
-
-                if (downloadUri == null)
-                {
-                    Console.WriteLine("Track {0} is skipped. No download/stream uri at all...", trackToHandle.Title);
-                }
-
-                uint trackReleaseYear = GetTrackReleaseYear(playlist, trackToHandle);
-
-                Track trackToAdd = new Track(trackArtist, trackName, trackReleaseYear, playlist.Title, (uint)(i),
-                    downloadUri);
-                if (trackToHandle.Artwork != null)
-                {
-                    trackToAdd.AlbumArtUri = new Uri(trackToHandle.Artwork);
-                }
+                trackToAdd.Album = playlist.Title;
 
                 res.Add(trackToAdd);
             }
+
+            if (!string.IsNullOrEmpty(playlist.ArtworkUrl))
+            {
+                Uri artworkUri = new Uri(playlist.ArtworkUrl);
+                res.ForEach(track => track.AlbumArtUri = artworkUri);
+            }
+
             return res;
         }
 
-        private static uint GetTrackReleaseYear(Playlist playlist, SoundCloud.NET.Track trackToHandle)
+        private Track GetTrackBySoundcloudTrack(SoundCloud.NET.Track trackToHandle)
         {
-            uint trackReleaseYear;
-            if (!uint.TryParse(trackToHandle.ReleaseYear, out trackReleaseYear))
+            string trackName;
+            string trackArtist = GetTrackArtist(trackToHandle, out trackName);
+
+            Uri downloadUri = null;
+            if (trackToHandle.Downloadable || trackToHandle.Streamable)
             {
-                trackReleaseYear = playlist.ReleaseYear != null ? (uint)playlist.ReleaseYear : 0;
+                downloadUri = CreateDownloadUriByTrackId(trackToHandle.Id);
             }
-            return trackReleaseYear;
+
+            if (downloadUri == null)
+            {
+                Console.WriteLine("Track {0} is skipped. No download/stream uri at all...", trackToHandle.Title);
+            }
+
+            uint trackReleaseYear = 0;
+            uint.TryParse(trackToHandle.ReleaseYear, out trackReleaseYear);
+
+            Track res = new Track(trackArtist, trackName, trackReleaseYear, string.Empty, 0, downloadUri);
+            if (trackToHandle.Artwork != null)
+            {
+                res.AlbumArtUri = new Uri(trackToHandle.Artwork);
+            }
+            return res;
         }
 
         private string GetTrackArtist(SoundCloud.NET.Track trackToHandle, out string trackName)

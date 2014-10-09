@@ -218,8 +218,14 @@ namespace MusicServiceLeecher.Workspaces.FileSystemWorkspace
             filename = filename.Replace("%artist", track.Artist);
             filename = filename.Replace("%year", track.Year.ToString());
 
+            if (track.TrackNumber == 0)
+            {
+                filename = filename.Replace("%tracknum", string.Empty);
+                return Path.Combine(WorkingDirectory.FullName, filename);
+            }
+
             int numOfLeadingZeros = (int)(Math.Floor(Math.Log10(track.TrackNumber) + 1)) - 1;
-            if (numOfLeadingZeros == 0)
+            if (numOfLeadingZeros == 0 || numOfLeadingZeros == int.MaxValue)
             {
                 filename = filename.Replace("%tracknum", track.TrackNumber.ToString());
             }

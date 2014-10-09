@@ -20,15 +20,15 @@ namespace MusicServiceLeecher
 
         public Uri DownloadUri { get; private set; }
 
-        public uint Year { get; private set; }
+        public uint Year { get; set; }
 
         public string Name { get; private set; }
 
         public string Artist { get; private set; }
 
-        public string Album { get; private set; }
+        public string Album { get; set; }
 
-        public uint TrackNumber { get; private set; }
+        public uint TrackNumber { get; set; }
         public Uri AlbumArtUri { get; set; }
     }
 }

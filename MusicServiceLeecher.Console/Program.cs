@@ -10,14 +10,15 @@ namespace MusicServiceLeecher.Console
         static void Main(string[] args)
         {
             IWorkspace ws = new FSWorkspace(string.Format("{0}\\Test\\", Environment.CurrentDirectory), true);
-            IMusicStreamingService bandcampService = new BandcampService();
+            /*IMusicStreamingService bandcampService = new BandcampService();
             bandcampService.DownloadAlbum(ws,
                 new Uri("http://asafavidanmusic.bandcamp.com/album/avidan-in-a-box-live-acoustic-recordings"));
 
-            bandcampService.DownloadSong(ws, new Uri("http://bigpauper.bandcamp.com/track/planet-telex-loop"));
+            bandcampService.DownloadSong(ws, new Uri("http://bigpauper.bandcamp.com/track/planet-telex-loop"));*/
 
             IMusicStreamingService soundcloudService = new SoundcloudService();
-            soundcloudService.DownloadAlbum(ws, new Uri("https://soundcloud.com/ethan-crystal/sets/fifa-15-soundtrack"));
+            //soundcloudService.DownloadAlbum(ws, new Uri("https://soundcloud.com/ethan-crystal/sets/fifa-15-soundtrack"));
+            soundcloudService.DownloadSong(ws, new Uri("https://soundcloud.com/guyha/04-tal-oren-still-want"));
         }
     }
 }
