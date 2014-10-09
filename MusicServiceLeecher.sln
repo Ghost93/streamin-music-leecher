@@ -14,6 +14,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5D18AB
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{340FD6F2-6573-4B2C-962E-1134D3644C0D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MusicServiceLeecher.MusicStreamingServices", "MusicServiceLeecher.MusicStreamingServices", "{DDC80EAB-36D4-49F1-8195-DEA227199F50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MusicServiceLeecher.Workspaces", "MusicServiceLeecher.Workspaces", "{9F1819DB-7A49-40D7-9FB0-1D7402FF312F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicServiceLeecher.MusicStreamingServices.BandcampMusicService", "BandcampMusicService\MusicServiceLeecher.MusicStreamingServices.BandcampMusicService.csproj", "{B9748340-03B5-439B-8868-09172A158E35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService", "SoundcloudMusicService\MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService.csproj", "{07E31490-665C-4328-86C7-E92339CE7290}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemWorkspace", "FileSystemWorkspace\FileSystemWorkspace.csproj", "{167D3CBC-694C-4628-84AD-0D681DA009B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,8 +43,25 @@ Global
 		{FE60FD67-2937-402A-B6CD-E4AA5A2EA7E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE60FD67-2937-402A-B6CD-E4AA5A2EA7E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE60FD67-2937-402A-B6CD-E4AA5A2EA7E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9748340-03B5-439B-8868-09172A158E35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9748340-03B5-439B-8868-09172A158E35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9748340-03B5-439B-8868-09172A158E35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9748340-03B5-439B-8868-09172A158E35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E31490-665C-4328-86C7-E92339CE7290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E31490-665C-4328-86C7-E92339CE7290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E31490-665C-4328-86C7-E92339CE7290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E31490-665C-4328-86C7-E92339CE7290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{167D3CBC-694C-4628-84AD-0D681DA009B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{167D3CBC-694C-4628-84AD-0D681DA009B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{167D3CBC-694C-4628-84AD-0D681DA009B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{167D3CBC-694C-4628-84AD-0D681DA009B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B9748340-03B5-439B-8868-09172A158E35} = {DDC80EAB-36D4-49F1-8195-DEA227199F50}
+		{07E31490-665C-4328-86C7-E92339CE7290} = {DDC80EAB-36D4-49F1-8195-DEA227199F50}
+		{167D3CBC-694C-4628-84AD-0D681DA009B8} = {9F1819DB-7A49-40D7-9FB0-1D7402FF312F}
 	EndGlobalSection
 EndGlobal

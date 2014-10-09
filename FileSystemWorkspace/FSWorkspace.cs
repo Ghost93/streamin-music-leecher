@@ -9,9 +9,9 @@ using TagLib;
 using TagLib.Id3v2;
 using File = TagLib.File;
 
-namespace MusicServiceLeecher.Workspaces
+namespace MusicServiceLeecher.Workspaces.FileSystemWorkspace
 {
-    public class FileSystemWorkspace : IWorkspace
+    public class FSWorkspace : IWorkspace
     {
         #region Constants
 
@@ -30,22 +30,22 @@ namespace MusicServiceLeecher.Workspaces
 
         #region Constructors
 
-        public FileSystemWorkspace(string workingDirectory, bool createIfNotExists)
+        public FSWorkspace(string workingDirectory, bool createIfNotExists)
             : this(workingDirectory, createIfNotExists, DEFAULT_PATTERN)
         {
         }
 
-        public FileSystemWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists)
+        public FSWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists)
             : this(workingDirectory, createIfNotExists, DEFAULT_PATTERN)
         {
         }
 
-        public FileSystemWorkspace(string workingDirectory, bool createIfNotExists, string pattern)
+        public FSWorkspace(string workingDirectory, bool createIfNotExists, string pattern)
             : this(new DirectoryInfo(workingDirectory), createIfNotExists, pattern)
         {
         }
 
-        public FileSystemWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists, string pattern)
+        public FSWorkspace(DirectoryInfo workingDirectory, bool createIfNotExists, string pattern)
         {
             if (workingDirectory == null)
             {
@@ -171,8 +171,8 @@ namespace MusicServiceLeecher.Workspaces
             if (downloadedFilesInfo == null) throw new ArgumentNullException("downloadedFilesInfo");
 
             AttachedPictureFrame res = new AttachedPictureFrame();
-            List<Uri> albumArtUris= downloadedFilesInfo.Keys.Select(x => x.AlbumArtUri).Distinct().ToList();
-            if (albumArtUris.Count!=1)
+            List<Uri> albumArtUris = downloadedFilesInfo.Keys.Select(x => x.AlbumArtUri).Distinct().ToList();
+            if (albumArtUris.Count != 1)
             {
                 return null;
             }
@@ -235,7 +235,7 @@ namespace MusicServiceLeecher.Workspaces
 
         private string CalculatePrefix(int numOfLeadingZeros)
         {
-            return new string('0',numOfLeadingZeros);
+            return new string('0', numOfLeadingZeros);
         }
 
         #endregion

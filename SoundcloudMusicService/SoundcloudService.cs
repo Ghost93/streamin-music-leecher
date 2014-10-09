@@ -9,7 +9,7 @@ using MusicServiceLeecher.Utilities;
 using Newtonsoft.Json.Linq;
 using SoundCloud.NET;
 
-namespace MusicServiceLeecher.MusicStreamingServices
+namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
 {
     public class SoundcloudService : IMusicStreamingService
     {
@@ -54,13 +54,10 @@ namespace MusicServiceLeecher.MusicStreamingServices
 
         public bool DownloadAlbum(IWorkspace workspace, Uri albumUri)
         {
-            IEnumerable<Track> album;
-
             try
             {
-                album = GetAlbumTracksByUri(albumUri);
+                IEnumerable<Track> album = GetAlbumTracksByUri(albumUri);
                 return workspace.HandleAlbum(album);
-
             }
             catch (Exception e)
             {
@@ -156,6 +153,8 @@ namespace MusicServiceLeecher.MusicStreamingServices
 
         private Uri CreateDownloadUriByTrackId(int trackId)
         {
+            //todo: use restsharp
+
             string streamUriString =
                 string.Format("http://api.sndcdn.com/i1/tracks/{0}/streams?client_id={1}",
                     trackId, m_ClintId);
@@ -235,8 +234,8 @@ namespace MusicServiceLeecher.MusicStreamingServices
             try
             {
                 client = new SoundCloudClient(
-                             new SoundCloudCredentials(m_ClintId, 
-                                                       m_ClientSecret, 
+                             new SoundCloudCredentials(m_ClintId,
+                                                       m_ClientSecret,
                                                        m_SoundCloudUsername,
                                                        m_SoundCloudPassword)
                                              );

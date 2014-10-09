@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MusicServiceLeecher.MusicStreamingServices;
-using MusicServiceLeecher.Workspaces;
+using MusicServiceLeecher.MusicStreamingServices.BandcampMusicService;
+using MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService;
+using MusicServiceLeecher.Workspaces.FileSystemWorkspace;
 
 namespace MusicServiceLeecher.Console
 {
@@ -12,14 +9,14 @@ namespace MusicServiceLeecher.Console
     {
         static void Main(string[] args)
         {
-            IWorkspace ws = new FileSystemWorkspace(string.Format("{0}\\Test\\", Environment.CurrentDirectory), true);
-            //BandcampService bandcampService = new BandcampService();
-            //bandcampService.DownloadAlbum(ws,
-              //  new Uri("http://asafavidanmusic.bandcamp.com/album/avidan-in-a-box-live-acoustic-recordings"));
+            IWorkspace ws = new FSWorkspace(string.Format("{0}\\Test\\", Environment.CurrentDirectory), true);
+            IMusicStreamingService bandcampService = new BandcampService();
+            bandcampService.DownloadAlbum(ws,
+                new Uri("http://asafavidanmusic.bandcamp.com/album/avidan-in-a-box-live-acoustic-recordings"));
 
-            //bandcampService.DownloadSong(ws, new Uri("http://bigpauper.bandcamp.com/track/planet-telex-loop"));
+            bandcampService.DownloadSong(ws, new Uri("http://bigpauper.bandcamp.com/track/planet-telex-loop"));
 
-            SoundcloudService soundcloudService = new SoundcloudService();
+            IMusicStreamingService soundcloudService = new SoundcloudService();
             soundcloudService.DownloadAlbum(ws, new Uri("https://soundcloud.com/ethan-crystal/sets/fifa-15-soundtrack"));
         }
     }

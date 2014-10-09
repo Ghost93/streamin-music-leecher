@@ -7,10 +7,9 @@ using System.Text;
 using HtmlAgilityPack;
 using Microsoft.Ajax.Utilities;
 using MusicServiceLeecher.Utilities;
-using MusicServiceLeecher.Workspaces;
 using Newtonsoft.Json.Linq;
 
-namespace MusicServiceLeecher.MusicStreamingServices
+namespace MusicServiceLeecher.MusicStreamingServices.BandcampMusicService
 {
     public class BandcampService : IMusicStreamingService
     {
@@ -27,12 +26,10 @@ namespace MusicServiceLeecher.MusicStreamingServices
 
         public bool DownloadSong(IWorkspace workspace, Uri songUri)
         {
-            Track track;
             try
             {
-                track = GetTrackByUri(songUri);
+                Track track = GetTrackByUri(songUri);
                 return workspace.HandleTrack(track);
-
             }
             catch (Exception e)
             {
@@ -43,13 +40,10 @@ namespace MusicServiceLeecher.MusicStreamingServices
 
         public bool DownloadAlbum(IWorkspace workspace, Uri albumUri)
         {
-            IEnumerable<Track> album;
-
             try
             {
-                album = GetAlbumTracksByUri(albumUri);
+                IEnumerable<Track> album = GetAlbumTracksByUri(albumUri);
                 return workspace.HandleAlbum(album);
-
             }
             catch (Exception e)
             {
