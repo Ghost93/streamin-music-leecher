@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
-using System.Text;
 using HtmlAgilityPack;
 using MusicServiceLeecher.Utilities;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using SoundCloud.NET;
 
 namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
@@ -18,7 +18,7 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
         private const string MP3_128_KBPS_URL = "http_mp3_128_url";
 
         //todo: get it out of here!
-        private string m_ClintId = "143d391e891ba3f8853fe3ab63c68037";
+        private string m_ClientId = "143d391e891ba3f8853fe3ab63c68037";
         private string m_ClientSecret = "477d7ea6a65dcbe25aa6c4c60ccb9ef8";
         private string m_SoundCloudUsername = "gh0st93";
         private string m_SoundCloudPassword = "20245056";
@@ -153,15 +153,21 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
 
         private Uri CreateDownloadUriByTrackId(int trackId)
         {
-            //todo: use restsharp
+            if (!m_SoundCloudClient.IsAuthenticated)
+            {
+                ReAuthenticate();
+            }
 
-            string streamUriString =
-                string.Format("http://api.sndcdn.com/i1/tracks/{0}/streams?client_id={1}",
-                    trackId, m_ClintId);
+            RestClient client = new RestClient("http://api.sndcdn.com");
+            client.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64)";
+            RestRequest request = new RestRequest("i1/tracks/{trackid}/streams", Method.GET);
+            request.AddParameter("client_id", m_ClientId);
+            request.AddUrlSegment("trackid", trackId.ToString());
+            request.AddHeader("content-type", "application/json");
 
-            HttpWebResponse response = MakeModifiedUserAgentRequest(new Uri(streamUriString), true);
-            string jsonResponse = WebUtils.GetResponseText(response, Encoding.UTF8);
-            JObject trackMetadata = JObject.Parse(jsonResponse);
+            IRestResponse response = client.Execute(request);
+            JObject trackMetadata = JObject.Parse(response.Content);
+
             if (trackMetadata[MP3_128_KBPS_URL] == null)
             {
                 return null;
@@ -234,7 +240,7 @@ namespace MusicServiceLeecher.MusicStreamingServices.SoundcloudMusicService
             try
             {
                 client = new SoundCloudClient(
-                             new SoundCloudCredentials(m_ClintId,
+                             new SoundCloudCredentials(m_ClientId,
                                                        m_ClientSecret,
                                                        m_SoundCloudUsername,
                                                        m_SoundCloudPassword)
