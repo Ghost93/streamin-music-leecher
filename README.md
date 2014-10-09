@@ -15,6 +15,7 @@ This project was created for learning purposes.
 * Html Agility Pack
 * Json.NET
 * TagLib#
+* RestSharp
 * [My branch of Soundcloud.NET](https://github.com/Ghost93/SoundCloud.NET) (*waiting for PR to be added...*)
 
 #####And the following repositories helped me:
